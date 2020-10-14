@@ -1,0 +1,5 @@
+rootProject.name = 'commons-lite'
+enableFeaturePreview('GRADLE_METADATA')
+
+
+include ':commons-lite-full'

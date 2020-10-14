@@ -1,0 +1,22 @@
+group 'ppanda.commons.bundle'
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenLocal()
+        maven {
+            url "https://dl.bintray.com/ppanda-beta/maven"
+        }
+    }
+}
+
+
+allprojects {
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven {
+            url "https://dl.bintray.com/ppanda-beta/maven"
+        }
+    }
+}
