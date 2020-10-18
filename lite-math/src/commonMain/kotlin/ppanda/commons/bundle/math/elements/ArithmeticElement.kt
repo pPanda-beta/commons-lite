@@ -1,5 +1,6 @@
 package ppanda.commons.bundle.math.elements
 
+import ppanda.commons.bundle.math.groups.BiGroup
 import ppanda.commons.bundle.math.groups.Group
 
 //TODO: should be done directly, unnecessary interface. This is equivalent to java Comparable<T>
@@ -16,7 +17,6 @@ interface AdditiveElement<T : AdditiveElement<T>> : SelfRecursive<T> {
 
     operator fun plus(other: T) = add(other)
     operator fun minus(other: T) = subtract(other)
-
 }
 
 interface MultiplicativeElement<T : MultiplicativeElement<T>> : SelfRecursive<T> {
@@ -30,4 +30,6 @@ interface MultiplicativeElement<T : MultiplicativeElement<T>> : SelfRecursive<T>
     operator fun div(other: T) = divide(other)
 }
 
-interface ArithmeticElement<T : ArithmeticElement<T>> : AdditiveElement<T>, MultiplicativeElement<T>
+interface ArithmeticElement<T : ArithmeticElement<T>> : AdditiveElement<T>, MultiplicativeElement<T> {
+    fun biGroup() = BiGroup.using(additiveGroup, multiplicativeGroup)
+}
