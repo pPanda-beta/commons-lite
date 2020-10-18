@@ -1,6 +1,7 @@
 package ppanda.commons.bundle.math.groups
 
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 
 interface Group<T> {
@@ -39,14 +40,20 @@ interface BiGroup<T> {
 
 
 object BiGroups {
-    val map: MutableMap<KClass<Any>, BiGroup<Any>> = mutableMapOf()
-    inline fun <reified T : Any> getGroupOfT(): BiGroup<T> = getGroupOf(T::class)
+    private val map: MutableMap<KType, BiGroup<Any>> = mutableMapOf()
 
-    inline fun <reified T : Any> installGroupOf(group: BiGroup<T>) = setGroupOfClazz(T::class, group)
+    @ExperimentalStdlibApi
+    inline fun <reified T : Any> getGroupOfT(): BiGroup<T> = getGroupOf(typeOf<T>())
 
-    fun <T : Any> getGroupOf(kClass: KClass<T>) = map[kClass as KClass<Any>]!! as BiGroup<T>
+    @ExperimentalStdlibApi
+    inline fun <reified T : Any> installGroupOf(group: BiGroup<T>) = setGroupOfClazz(typeOf<T>(), group)
 
-    fun <T : Any> setGroupOfClazz(kClass: KClass<T>, group: BiGroup<T>) =
-        map.put(kClass as KClass<Any>, group as BiGroup<Any>)
+    fun <T : Any> getGroupOf(kType: KType) = map[kType]!! as BiGroup<T>
+
+    fun <T : Any> getOrComputeGroupOf(kType: KType, generator: () -> BiGroup<T>) =
+        map.getOrPut(kType, { generator() as BiGroup<Any> }) as BiGroup<T>
+
+    fun <T : Any> setGroupOfClazz(kType: KType, group: BiGroup<T>) =
+        map.put(kType, group as BiGroup<Any>)
 }
 

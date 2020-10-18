@@ -3,23 +3,27 @@ package ppanda.commons.bundle.math.elements
 import ppanda.commons.bundle.math.groups.BiGroup
 import ppanda.commons.bundle.math.groups.BiGroups
 import ppanda.commons.bundle.math.groups.Group
-import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
-data class Primitive<T : Any>(val value: T, val clazz: KClass<T>) : ArithmeticElement<Primitive<T>> {
-    private val biGroup = BiGroups.getGroupOf(clazz)
+data class Primitive<T : Any>(val value: T, val kType: KType) : ArithmeticElement<Primitive<T>> {
+    private val biGroupOfT = BiGroups.getGroupOf<T>(kType)
 
-    override val additiveGroup: Group<Primitive<T>>
-        get() = primitiveGroupUsing(biGroup.additiveGroup, clazz)
-    override val multiplicativeGroup: Group<Primitive<T>>
-        get() = primitiveGroupUsing(biGroup.multiplicativeGroup, clazz)
+    override val additiveGroup: Group<Primitive<T>> by lazy {
+        primitiveGroupUsing(biGroupOfT.additiveGroup, kType)
+    }
+    override val multiplicativeGroup: Group<Primitive<T>> by lazy {
+        primitiveGroupUsing(biGroupOfT.multiplicativeGroup, kType)
+    }
 
     override fun toString(): String = value.toString()
 
+    @ExperimentalStdlibApi
     companion object {
-        inline fun <reified E : Number> of(e: E) = Primitive(e, E::class)
+        inline fun <reified E : Any> of(e: E) = Primitive(e, typeOf<E>())
 
-        inline fun <reified E : Number> biGroup() =
-            primitiveGroupUsing(BiGroups.getGroupOfT(), E::class)
+        inline fun <reified E : Any> biGroup(): BiGroup<Primitive<E>> =
+            primitiveGroupUsing(BiGroups.getGroupOfT(), typeOf<E>(), typeOf<Primitive<E>>())
 
         init {
             installAllPrimitiveGroups()
@@ -27,19 +31,25 @@ data class Primitive<T : Any>(val value: T, val clazz: KClass<T>) : ArithmeticEl
     }
 }
 
-fun <E : Any> primitiveGroupUsing(groupOfE: Group<E>, clazz: KClass<E>): Group<Primitive<E>> =
+fun <E : Any> primitiveGroupUsing(groupOfE: Group<E>, kType: KType): Group<Primitive<E>> =
     object : Group<Primitive<E>> {
-        override val identity = Primitive(groupOfE.identity, clazz)
-        override fun inverse(x: Primitive<E>) = Primitive(groupOfE.inverse(x.value), clazz)
+        override val identity = Primitive(groupOfE.identity, kType)
+        override fun inverse(x: Primitive<E>) = Primitive(groupOfE.inverse(x.value), kType)
         override fun operation(x: Primitive<E>, y: Primitive<E>) =
-            Primitive(groupOfE.operation(x.value, y.value), clazz)
+            Primitive(groupOfE.operation(x.value, y.value), kType)
     }
 
-fun <E : Any> primitiveGroupUsing(groupOfE: BiGroup<E>, clazz: KClass<E>): BiGroup<Primitive<E>> = BiGroup.using(
-    primitiveGroupUsing(groupOfE.additiveGroup, clazz),
-    primitiveGroupUsing(groupOfE.multiplicativeGroup, clazz)
-)
+fun <E : Any> primitiveGroupUsing(
+    groupOfE: BiGroup<E>, kType: KType, primitiveKType: KType
+): BiGroup<Primitive<E>> = BiGroups.getOrComputeGroupOf(primitiveKType) {
+    BiGroup.using(
+        primitiveGroupUsing(groupOfE.additiveGroup, kType),
+        primitiveGroupUsing(groupOfE.multiplicativeGroup, kType)
+    )
+}
 
+
+@ExperimentalStdlibApi
 fun installAllPrimitiveGroups() {
     BiGroups.installGroupOf(BiGroup.create(0, { -it }, Int::plus, 1, { 1 / it }, Int::times))
     BiGroups.installGroupOf(BiGroup.create(0.0, { -it }, Double::plus, 1.0, { 1.0 / it }, Double::times))
