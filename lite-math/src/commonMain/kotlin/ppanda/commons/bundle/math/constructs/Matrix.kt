@@ -26,9 +26,11 @@ open class Matrix<T : ArithmeticElement<T>>(
             .reduce(ArithmeticElement<T>::add)
     }
 
-    fun identityOfSameRowSize() = SquareMatrix.identity(noOfRows, this[0][0].biGroup())
-    fun identityOfSameColSize() = SquareMatrix.identity(noOfCols, this[0][0].biGroup())
-    fun zeroOfSameSize() = zero<T>(noOfRows, noOfCols, this[0][0].biGroup())
+    fun identityOfSameRowSize() = SquareMatrix.identity(noOfRows, biGroupOfT())
+    fun identityOfSameColSize() = SquareMatrix.identity(noOfCols, biGroupOfT())
+    fun zeroOfSameSize() = zero<T>(noOfRows, noOfCols, biGroupOfT())
+
+    private fun biGroupOfT() = this[0][0].biGroup()
 
     fun getRow(i: Int) = rows[i]
     fun getColumn(j: Int) = rows.map { it[j] }
@@ -60,6 +62,29 @@ open class Matrix<T : ArithmeticElement<T>>(
 
 
     fun transpose(): Matrix<T> = generateOfSize(noOfCols, noOfRows) { i, j -> this[j][i] }
+
+    // TODO: Needs optimization, should be under O(m*n)
+    open fun getCofactor(i: Int, j: Int): Matrix<T> =
+        filterRows { row, rowIndex -> rowIndex != i }
+            .filterCols { col, colIndex -> colIndex != j }
+
+
+    open fun determinant(): T {
+        if (noOfRows == 1 && noOfCols == 1) {
+            return this[0][0]
+        }
+        var determinant: T = biGroupOfT().additiveGroup.identity // Ideally zero
+        var sign: T = biGroupOfT().multiplicativeGroup.identity // Ideally equivalent of +1
+        val firstRow = getRow(0)
+        for (columnIndex in firstRow.indices) {
+            val cell = firstRow[columnIndex]
+            val determinantOfCoFactor = getCofactor(0, columnIndex)
+                .determinant()
+            determinant += sign * cell * determinantOfCoFactor
+            sign = sign.additiveInverse()
+        }
+        return determinant
+    }
 
 
     private fun getColumnSeq(j: Int) = rows.asSequence().map { it[j] }

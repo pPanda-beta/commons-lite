@@ -50,6 +50,20 @@ class MatrixTest {
         assertEquals(actualTransposedMatrix, expectedTransposedMatrix)
     }
 
+
+    @Test
+    fun shouldFindDeterminant() {
+        val I3 = SquareMatrix.identity(3, Primitive.biGroup<Double>())
+        val matrix = primitiveMatrix(
+            listOf(1.2, 0.0, 3.4),
+            listOf(0.0, 0.0, 8.9),
+            listOf(7.0, 6.5, 0.0),
+        )
+
+        assertEquals(I3.determinant(), of(1.0))
+        assertEquals(matrix.determinant(), of(-69.42))
+    }
+
     @Test
     fun shouldSupportMatrixOfMatrix() {
         val I2 = SquareMatrix.identity(2, Primitive.biGroup<Int>())
