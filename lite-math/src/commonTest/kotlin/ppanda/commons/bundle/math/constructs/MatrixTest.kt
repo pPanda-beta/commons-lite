@@ -64,6 +64,43 @@ class MatrixTest {
         assertEquals(matrix.determinant(), of(-69.42))
     }
 
+
+    @Test
+    fun shouldDeriveAdjoint() {
+        val matrix = primitiveSquareMatrix(
+            listOf(3, 1, -1),
+            listOf(2, -2, 0),
+            listOf(1, 2, -1),
+        )
+        val expectedAdjointMatrix = primitiveSquareMatrix(
+            listOf(2, -1, -2),
+            listOf(2, -2, -2),
+            listOf(6, -5, -8),
+        )
+
+
+        val actualAdjointMatrix = matrix.adjoint()
+        assertEquals(actualAdjointMatrix, expectedAdjointMatrix)
+    }
+
+    @Test
+    fun shouldDeriveInverse() {
+        val matrix = primitiveSquareMatrix(
+            listOf(4, 3),
+            listOf(3, 2),
+        )
+        val expectedInverseMatrix = primitiveSquareMatrix(
+            listOf(-2, 3),
+            listOf(3, -4),
+        )
+
+
+        val actualInverseMatrix = matrix.inverse()
+        matrix.multiplicativeInverse()
+        assertEquals(actualInverseMatrix, expectedInverseMatrix)
+    }
+
+
     @Test
     fun shouldSupportMatrixOfMatrix() {
         val I2 = SquareMatrix.identity(2, Primitive.biGroup<Int>())
@@ -98,5 +135,8 @@ class MatrixTest {
 
     private inline fun <reified T : Any> primitiveMatrix(vararg rows: List<T>) =
         Matrix(rows.map { row -> row.map { of(it) } })
+
+    private inline fun <reified T : Any> primitiveSquareMatrix(vararg rows: List<T>) =
+        SquareMatrix(rows.map { row -> row.map { of(it) } })
 }
 
