@@ -59,6 +59,9 @@ open class Matrix<T : ArithmeticElement<T>>(
     )
 
 
+    fun transpose(): Matrix<T> = generateOfSize(noOfCols, noOfRows) { i, j -> this[j][i] }
+
+
     private fun getColumnSeq(j: Int) = rows.asSequence().map { it[j] }
 
 

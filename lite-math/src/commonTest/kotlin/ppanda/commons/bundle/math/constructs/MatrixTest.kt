@@ -34,6 +34,23 @@ class MatrixTest {
     }
 
     @Test
+    fun shouldTranspose() {
+        val matrix = primitiveMatrix(
+            listOf(8, 1, 2),
+            listOf(-5, 6, 7),
+        )
+        val expectedTransposedMatrix = primitiveMatrix(
+            listOf(8, -5),
+            listOf(1, 6),
+            listOf(2, 7),
+        )
+
+
+        val actualTransposedMatrix = matrix.transpose()
+        assertEquals(actualTransposedMatrix, expectedTransposedMatrix)
+    }
+
+    @Test
     fun shouldSupportMatrixOfMatrix() {
         val I2 = SquareMatrix.identity(2, Primitive.biGroup<Int>())
         val _I3I2 = SquareMatrix.identity(3, I2.biGroup())
