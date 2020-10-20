@@ -9,8 +9,8 @@ data class Fraction private constructor(
 ) : ArithmeticElement<Fraction> {
     // TODO: Allow initialization logic to constructor
 
-    override val additiveGroup: Group<Fraction> = additionFracGroup
-    override val multiplicativeGroup: Group<Fraction> = multFracGroup
+    override val additiveGroup: Group<Fraction> by lazy { additionFracGroup }
+    override val multiplicativeGroup: Group<Fraction> by lazy { multFracGroup }
 
     override fun toString(): String = "$numerator/$denominator"
 

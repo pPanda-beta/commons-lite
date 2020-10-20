@@ -2,8 +2,22 @@ package ppanda.commons.bundle.math.constructs
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class FractionTest {
+    @Test
+    fun shouldNotNullGroups() { // TODO: bug in kotlin
+
+        val x = Fraction.of(1, 2)
+        assertNotNull(x.multiplicativeGroup)
+        assertEquals(x.multiplicativeGroup.identity, Fraction.ONE)
+
+        assertNotNull(Fraction.ZERO.multiplicativeGroup.identity.multiplicativeGroup)
+        assertNotNull(Fraction.ZERO.multiplicativeGroup.identity.additiveGroup)
+        assertNotNull(Fraction.ZERO.additiveGroup.identity.multiplicativeGroup)
+        assertNotNull(Fraction.ZERO.additiveGroup.identity.additiveGroup)
+    }
+
     @Test
     fun shouldHaveGroupIdentityFeatures() {
         val _3by4 = Fraction.of(3, 4)
