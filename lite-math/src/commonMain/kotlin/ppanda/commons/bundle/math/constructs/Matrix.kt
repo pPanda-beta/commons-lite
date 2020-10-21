@@ -116,6 +116,8 @@ open class Matrix<T : ArithmeticElement<T>>(
         return true
     }
 
+    fun asSquareMatrix(): SquareMatrix<T> = SquareMatrix(rows)
+
     companion object {
         fun <E : ArithmeticElement<E>> generateOfSize(noOfRows: Int, noOfCols: Int, generator: ((Int, Int) -> E)) =
             Matrix(generateRows(noOfRows, noOfCols, generator))
@@ -170,11 +172,19 @@ open class SquareMatrix<T : ArithmeticElement<T>>(rows: List<List<T>>) : Matrix<
             SquareMatrix(generateRows(size, size, generator))
 
         fun <E : ArithmeticElement<E>> identity(size: Int, biGroup: BiGroup<E>) = generateOfSize(size) { i, j ->
+            bollke(biGroup)
             if (i == j) biGroup.multiplicativeGroup.identity else biGroup.additiveGroup.identity
         }
+
     }
 }
 
+
+private fun <E : ArithmeticElement<E>> bollke(biGroup: BiGroup<E>) {
+    if (biGroup.multiplicativeGroup.identity.multiplicativeGroup == null) {
+        println("More bad of " + biGroup.multiplicativeGroup.identity)
+    }
+}
 
 private fun <E : ArithmeticElement<E>> generateRows(
     noOfRows: Int,
